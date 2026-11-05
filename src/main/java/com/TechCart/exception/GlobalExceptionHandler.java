@@ -13,47 +13,77 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // VALIDATION ERRORS
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationErrors(
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(
             MethodArgumentNotValidException exception) {
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Object> errors = new HashMap<>();
 
         exception.getBindingResult().getFieldErrors().forEach(error ->
-            errors.put(error.getField(), error.getDefaultMessage())
+                errors.put(error.getField(), error.getDefaultMessage())
         );
 
         return ResponseEntity.badRequest().body(errors);
     }
 
+    // INVALID JSON
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleInvalidJson(
             HttpMessageNotReadableException exception) {
 
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Invalid JSON request");
-
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.badRequest().body(
+                Map.of("error", "Invalid JSON request")
+        );
     }
 
+    //ILLEGAL ARGUMENT 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(
-            IllegalArgumentException exception) {
+             IllegalArgumentException exception) {
 
-        Map<String, String> error = new HashMap<>();
-        error.put("error", exception.getMessage());
+        return ResponseEntity
+            .badRequest()
+            .body(Map.of("error", exception.getMessage()));
+     }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    // DUPLICATE EMAIL
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateEmail(
+            DuplicateEmailException exception) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                Map.of("error", exception.getMessage())
+        );
     }
 
+    // INVALID LOGIN CREDENTIALS
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentials(
+            InvalidCredentialsException exception) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of("error", exception.getMessage())
+        );
+    }
+
+    // USER NOT FOUND
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFound(
+            UserNotFoundException exception) {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Map.of("error", exception.getMessage())
+        );
+    }
+
+    // OTHER UNEXPECTED ERRORS
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(
             Exception exception) {
 
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "An unexpected error occurred");
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(error);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                Map.of("error", "An unexpected error occurred")
+        );
     }
 }

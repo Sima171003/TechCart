@@ -1,12 +1,14 @@
 package com.TechCart.security;
 
+import com.TechCart.user.User;
+import com.TechCart.user.UserRepository;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+//import org.springframework.security.core.userdetails.User;
 
-import com.TechCart.user.User;
-import com.TechCart.user.UserRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -21,10 +23,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email)
+        com.TechCart.user.User user = userRepository.findByEmail(email)
+                .filter(com.TechCart.user.User::isActive)
                 .orElseThrow(() ->
-                    new UsernameNotFoundException("User not found with email: " + email)
-                );
+                        new UsernameNotFoundException("User not found or inactive"));
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())

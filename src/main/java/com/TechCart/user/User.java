@@ -1,6 +1,5 @@
 package com.TechCart.user;
 
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -15,12 +14,12 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "full_name", nullable = false, length = 150)
+    @Column(nullable = false, length = 150)
     private String fullName;
 
     @Column(nullable = false, unique = true, length = 150)
@@ -32,34 +31,37 @@ public class User {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false)
+    private boolean isActive = true;
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Default constructor required by JPA
     public User() {
     }
 
-    // Automatically set timestamps before inserting
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+        isActive = true;
     }
 
-    // Automatically update timestamp before updating
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
-
     public Long getUserId() {
         return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getFullName() {
@@ -82,8 +84,8 @@ public class User {
         return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.passwordHash = password;
+    public void setPassword(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getPhoneNumber() {
@@ -94,6 +96,14 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -101,5 +111,4 @@ public class User {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-    
 }
