@@ -60,6 +60,10 @@ public class Conversation {
         this.converId = converId;
     }
 
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+}
+
     public User getUser() {
         return user;
     }
